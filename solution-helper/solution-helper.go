@@ -16,6 +16,16 @@ import "strings"
 
 func main() {
 	var contestNum, username, password string
+	fmt.Println(`
+		This is a software for helping solution writing on biancheng.love/
+		Use the username and password you use when you login to the site
+		Contest ID means the "99" in URL http://biancheng.love/contest/99/problem (for example)
+		It will download the description and your last Accepted code automically, and deploy them in output.html in the same directory
+		RENAME the file as soon as it's generated, otherwise it may be earsed next time it runs
+		Enjoy using
+		Distributed under BSD-3 clause
+		NO WARRANTY
+		`)
 	fmt.Print("ID of the contest:")
 	fmt.Scanln(&contestNum)
 	jar, _ := cookiejar.New(nil)

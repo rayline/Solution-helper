@@ -7,8 +7,9 @@ import "net/http/cookiejar"
 import "bytes"
 import "regexp"
 import "os"
+import "html"
 
-//import "io/ioutil"
+import "io/ioutil"
 
 import "strings"
 
@@ -17,14 +18,14 @@ import "strings"
 func main() {
 	var contestNum, username, password string
 	fmt.Println(`
-		This is a software for helping solution writing on biancheng.love/
-		Use the username and password you use when you login to the site
-		Contest ID means the "99" in URL http://biancheng.love/contest/99/problem (for example)
-		It will download the description and your last Accepted code automically, and deploy them in output.html in the same directory
-		RENAME the file as soon as it's generated, otherwise it may be earsed next time it runs
-		Enjoy using
-		Distributed under BSD-3 clause
-		NO WARRANTY
+This is a software for helping solution writing on biancheng.love/
+Use the username and password you use when you login to the site
+Contest ID means the "99" in URL http://biancheng.love/contest/99/problem (for example)
+It will download the description and your last Accepted code automically, and deploy them in output.html in the same directory
+RENAME the file as soon as it's generated, otherwise it may be earsed next time it runs
+Enjoy using
+Distributed under BSD-3 clause
+NO WARRANTY
 		`)
 	fmt.Print("ID of the contest:")
 	fmt.Scanln(&contestNum)
@@ -60,7 +61,6 @@ func main() {
 			"Network Problem\n")
 	}
 	f, _ := os.Create("output.html")
-	r := strings.NewReplacer("&lt;", "<", "&gt;", ">")
 	//writing HTML head here
 	f.WriteString(`<!DOCTYPE html>
 		<html lang="zh-ch">
@@ -94,23 +94,27 @@ func main() {
 			buf.Reset()
 			resp.Write(buf)
 			code = buf.String()
-			code = r.Replace(codeExp.FindString(code))
+			code = codeExp.FindString(code)
 		}
 		if submission == "1" {
-			//var codePath string
-			//L1:
-			fmt.Println("No Accepted Submission Found Online for problem " + string(link[i][9]) + "! The code section will be left clear and you'll have to do add it on yourself")
-			code = "在此处添加代码"
-			/*fmt.Scanf("%s", &codePath)
+			fmt.Println("No Accepted Submission Found Online for problem " + string(link[i][9]) + "! Specific local file instead")
+			fmt.Print("file path :")
+			var codePath string
+			fmt.Scanln(&codePath)
 			if len(codePath) > 0 {
 				codeFile, err := os.Open(codePath)
 				if err != nil {
 					fmt.Println(err)
-					goto L1
 				}
 				bbuf, err := ioutil.ReadAll(codeFile)
-				f.Write(bbuf)
-			}*/
+				if err != nil {
+					fmt.Println(err)
+				}
+				code = string(bbuf)
+				code = html.EscapeString(code)
+			} else {
+				code = "请在此处添加代码"
+			}
 		}
 		f.WriteString(`<div class="markdown-body containing">
 				<!--TODO: Write your solution here-->
